@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KAIYUM VOUCHER OFFICIAL</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .gold-text { background: linear-gradient(to right, #FFD700, #FFA500); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .glass { background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(10px); border: 1px solid rgba(255, 215, 0, 0.2); }
+        body { background-color: #050505; color: white; }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col items-center p-6 font-sans">
+
+    <div class="w-full max-w-md flex justify-between items-center mb-8 mt-4">
+        <div class="flex items-center space-x-3">
+            <div class="w-12 h-12 rounded-full border border-yellow-500/50 p-1">
+                <div class="bg-gray-800 w-full h-full rounded-full flex items-center justify-center font-bold text-yellow-500">K</div>
+            </div>
+            <div>
+                <h1 class="gold-text font-black text-xl tracking-tighter">KAIYUM</h1>
+                <p class="text-[8px] text-gray-500 uppercase tracking-[3px]">Verified Seller</p>
+            </div>
+        </div>
+        <div class="bg-[#FFD700] text-black text-[10px] font-black px-4 py-1.5 rounded-full uppercase">STORE</div>
+    </div>
+
+    <div class="w-full max-w-md glass rounded-[2.5rem] p-8 shadow-2xl">
+        <div class="text-center mb-6">
+            <span class="text-[10px] font-black uppercase tracking-widest text-gray-400 italic">Secure Line</span>
+        </div>
+        
+        <input id="vcode" type="text" placeholder="..." 
+            class="w-full bg-transparent border-b border-gray-800 py-4 text-center text-2xl font-mono tracking-[0.2em] outline-none focus:border-yellow-500 transition-all mb-8">
+        
+        <button onclick="checkVoucher()" class="w-full bg-[#00C853] hover:bg-green-600 text-white font-black py-5 rounded-3xl shadow-lg active:scale-95 transition-all flex items-center justify-center space-x-2">
+            <span>CONFIRM VOUCHER</span>
+        </button>
+
+        <div id="status" class="mt-8 text-center text-sm font-bold min-h-[60px]"></div>
+    </div>
+
+    <div class="w-full max-w-md mt-10">
+        <h3 class="text-[10px] font-black uppercase tracking-[0.3em] text-gray-600 mb-4">Activity History</h3>
+        <div id="historyList" class="space-y-4">
+            </div>
+    </div>
+
+    <script>
+        let history = JSON.parse(localStorage.getItem('v_history')) || [];
+
+        function updateUI() {
+            const list = document.getElementById('historyList');
+            list.innerHTML = history.map(item => `
+                <div class="bg-gray-900/50 border border-gray-800 p-4 rounded-2xl flex justify-between items-center">
+                    <div>
+                        <p class="text-[10px] font-mono text-gray-400">${item.code}</p>
+                        <p class="text-[8px] text-gray-600">${item.time}</p>
+                    </div>
+                    <span class="text-[8px] font-black ${item.status === 'SUCCESS' ? 'text-green-500' : 'text-red-500'} uppercase">${item.status}</span>
+                </div>
+            `).join('');
+        }
+
+        function checkVoucher() {
+            const input = document.getElementById('vcode');
+            const code = input.value.trim();
+            const status = document.getElementById('status');
+            const time = new Date().toLocaleString();
+
+            if(!code) return;
+
+            const exists = history.find(h => h.code === code);
+
+            if(exists) {
+                status.innerHTML = `<p class="text-red-500 animate-pulse uppercase">Already Used!<br><span class="text-[10px] text-gray-600">Used at: ${exists.time}</span></p>`;
+            } else {
+                history.unshift({code: code, time: time, status: 'SUCCESS'});
+                localStorage.setItem('v_history', JSON.stringify(history));
+                status.innerHTML = `<p class="text-green-500 uppercase tracking-widest text-lg">Confirmed!<br><span class="text-[10px] text-gray-400">Time: ${time}</span></p>`;
+                input.value = '';
+                updateUI();
+            }
+        }
+        updateUI();
+    </script>
+</body>
+</html>
